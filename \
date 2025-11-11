@@ -1,0 +1,111 @@
+#include "get_next_line.h"
+#include <unistd.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <stdlib.h>
+
+#define BUFF_SIZE 234 
+
+int	is_newline(char *str)
+{
+	int	i;
+
+	i = 0;
+	while(str[i])
+	{
+		if(str[i] == '\n')
+			return (i);
+		i++;
+	}
+	return (-1);
+}
+
+char *return_first_nl(int fd, char *rest)
+{
+	char		**prev_buffer;
+	char		buffer[BUFF_SIZE];
+	int			i;
+	int			pos;
+	char		*line;
+	
+	i = 0;
+	prev_buffer = malloc(sizeof(*prev_buffer) * BUFF_SIZE + 1);
+	if(rest[0] != '\0')
+	{
+		prev_buffer[i] = ft_strndup(rest, BUFF_SIZE - 1);
+		i++;
+	}
+	while (read(fd, buffer, BUFF_SIZE - 1) > 0)
+	{
+		printf("%d\n", pos = is_newline(buffer));
+		if((pos = is_newline(buffer)) >= 0)
+		{
+			prev_buffer[i] = NULL;
+			line = malloc(sizeof(*line) * (BUFF_SIZE * i) + pos + 1);
+			line = ft_free_join(prev_buffer);
+			ft_strncat(line, buffer, pos);
+			ft_strcpy(rest, buffer + pos);
+			printf("%s\n", line);
+			return (line);
+		}
+		prev_buffer[i++] = ft_strndup(buffer, BUFF_SIZE - 1);
+		read(fd, buffer, BUFF_SIZE - 1);
+	}
+	free(rest);
+	return (NULL);
+}
+
+char *get_next_line(int fd)
+{
+    static char	*rest;
+	char		*line;
+	int			pos;
+
+	if(!rest)
+	{
+		rest = malloc(sizeof(*rest) * BUFF_SIZE + 1);
+		rest[0] = '\0';
+	}
+	if ((pos = is_newline(rest)) >= 0)
+	{
+		line = ft_strndup(rest, pos);
+		ft_strcpy(rest, rest + pos);
+		return (line);
+	}
+	line = return_first_nl(fd, rest);
+	if(line == NULL)
+		return (NULL);
+	return (line);
+}
+
+void read_file(char *filename)
+{
+    int fd;
+
+    fd = open(filename, O_RDONLY);
+    if (fd != -1)
+    {
+		get_next_line(fd);
+		get_next_line(fd);
+		get_next_line(fd);
+		get_next_line(fd);
+		get_next_line(fd);
+	}
+    else 
+    {
+        printf("bug");
+    }
+}
+
+int main(int argc, char **arg)
+{
+	char *line; 
+    (void)argc;
+    if(arg[1])
+		read_file(arg[1]);
+	else 
+	{
+		while ((line = get_next_line(0)))
+			printf("%s\n", line);
+	}
+}
