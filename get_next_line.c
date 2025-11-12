@@ -27,28 +27,28 @@ char	*ft_free_join(char **strs, char *buffer, int n, int c)
 	if (!strs)
 		return (NULL);
 	strs[c] = NULL;
-	while (strs[i] != NULL)
+	while (i < c)
 		len += ft_strlen(strs[i++]);
-	join = malloc(sizeof(*join) * len + BUFFER_SIZE + 1);
+	join = malloc(sizeof(char) * (len + 1) + BUFFER_SIZE + 1);
 	if (!join)
 		return (NULL);
 	join[0] = '\0';
 	i = -1;
-	while (strs[i++] != NULL)
+	while (++i < c)
 		ft_strncat(join, strs[i], ft_strlen(strs[i]));
 	ft_strncat(join, buffer, n);
-	free_str(strs);
+	free_str(strs, c);
 	return (join);
 }
 
-char	*return_first_nl(int fd, char *rest)
+char	*first_nl(int fd, char *rest)
 {
 	char		**prev_buffer;
 	char		buffer[BUFFER_SIZE];
 	int			i;
 	int			pos;
 
-	prev_buffer = malloc(sizeof(char *) * 433 * BUFFER_SIZE + 1);
+	prev_buffer = malloc(sizeof(char *) * 4 * BUFFER_SIZE + 1);
 	if (!prev_buffer)
 		return (NULL);
 	i = 0;
@@ -56,7 +56,7 @@ char	*return_first_nl(int fd, char *rest)
 		prev_buffer[i++] = ft_strndup(rest, ft_strlen(rest));
 	while (read(fd, buffer, BUFFER_SIZE - 1) > 0)
 	{
-		buffer[BUFFER_SIZE] = '\0';
+		buffer[BUFFER_SIZE - 1] = '\0';
 		pos = is_newline(buffer);
 		if (pos >= 0)
 		{
@@ -65,6 +65,7 @@ char	*return_first_nl(int fd, char *rest)
 		}
 		prev_buffer[i++] = ft_strndup(buffer, BUFFER_SIZE - 1);
 	}
+	free(prev_buffer);
 	return (NULL);
 }
 
@@ -76,7 +77,7 @@ char	*get_next_line(int fd)
 
 	if (!rest)
 	{
-		rest = malloc(sizeof(*rest) * BUFFER_SIZE + 1);
+		rest = malloc(sizeof(char) * 54 * BUFFER_SIZE + 1);
 		if (!rest)
 			return (NULL);
 		rest[0] = '\0';
@@ -88,7 +89,7 @@ char	*get_next_line(int fd)
 		ft_strcpy(rest, rest + pos + 1);
 		return (line);
 	}
-	line = return_first_nl(fd, rest);
+	line = first_nl(fd, rest);
 	if (line == NULL)
 	{
 		free(rest);
@@ -107,7 +108,7 @@ void	read_file(char *filename)
 	{
 		while ((line = get_next_line(fd)))
 		{
-			printf("line = %s\n", line);
+			printf("line : %s\n", line);
 			free(line);
 		}
 	}

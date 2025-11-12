@@ -13,7 +13,7 @@
 size_t	ft_strlen(char *str);
 char	*ft_strcpy(char *dst, char *src);
 void	ft_strncat(char *dst, char *str, int c);
-void	free_str(char **str);
+void	free_str(char **str, int c);
 char	*ft_strndup(char *str, size_t n);
 char	*ft_free_join(char **strs, char *buffer, int n, int c);
 

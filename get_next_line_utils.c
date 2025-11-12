@@ -57,14 +57,14 @@ char	*ft_strndup(char *str, size_t n)
 	return (dup);
 }
 
-void	free_str(char **str)
+void	free_str(char **str, int c)
 {
 	int	i;
 
 	i = 0;
 	if (!str)
 		return ;
-	while (str[i] != NULL)
+	while (i < c)
 		free(str[i++]);
 	free(str);
 }
