@@ -47,6 +47,7 @@ char	*first_nl(int fd, char *rest)
 	char		buffer[BUFFER_SIZE];
 	int			i;
 	int			pos;
+	ssize_t		nbytes;
 
 	prev_buffer = malloc(sizeof(char *) * 4 * BUFFER_SIZE + 1);
 	if (!prev_buffer)
@@ -54,9 +55,10 @@ char	*first_nl(int fd, char *rest)
 	i = 0;
 	if (rest && *rest)
 		prev_buffer[i++] = ft_strndup(rest, ft_strlen(rest) + 1);
-	while (read(fd, buffer, BUFFER_SIZE - 1) > 0)
+	nbytes = read(fd, buffer, BUFFER_SIZE - 1);
+	while (nbytes)
 	{
-		buffer[BUFFER_SIZE - 1] = '\0';
+		buffer[nbytes] = '\0';
 		pos = is_newline(buffer);
 		if (pos >= 0)
 		{
@@ -64,6 +66,7 @@ char	*first_nl(int fd, char *rest)
 			return (ft_free_join(prev_buffer, buffer, pos + 1, i));
 		}
 		prev_buffer[i++] = ft_strndup(buffer, BUFFER_SIZE - 1);
+		nbytes = read(fd, buffer, BUFFER_SIZE - 1);
 	}
 	free(prev_buffer);
 	return (NULL);
