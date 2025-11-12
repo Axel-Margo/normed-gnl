@@ -12,17 +12,16 @@ size_t	ft_strlen(char *str)
 	return (i);
 }
 
-char	*ft_strcpy(char *dst, char *src)
+char	*ft_strcpy(char *dst, char *src, int pos)
 {
-	char	*temp;
+	int		j;
 
-	if (!src)
-		return (dst);
-	temp = dst;
-	while (*src)
-		*temp++ = *src++;
-	*temp = '\0';
-	return (dst);
+	j = 0;
+    while (src[pos])
+            dst[j++] = src[pos++];
+	dst[j] = '\0';
+    return (dst);
+
 }
 
 void	ft_strncat(char *dst, char *src, int c)

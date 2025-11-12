@@ -11,7 +11,7 @@
 #include <fcntl.h>
 
 size_t	ft_strlen(char *str);
-char	*ft_strcpy(char *dst, char *src);
+char	*ft_strcpy(char *dst, char *src, int pos);
 void	ft_strncat(char *dst, char *str, int c);
 void	free_str(char **str, int c);
 char	*ft_strndup(char *str, size_t n);

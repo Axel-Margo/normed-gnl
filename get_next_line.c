@@ -9,7 +9,7 @@ int	is_newline(char *str)
 		return (-1);
 	while (str[i])
 	{
-		if (str[i] == '\n')
+		if (str[i] == '\n' || str[i] == '\0')
 			return (i);
 		i++;
 	}
@@ -52,15 +52,15 @@ char	*first_nl(int fd, char *rest)
 	if (!prev_buffer)
 		return (NULL);
 	i = 0;
-	if (rest[0])
-		prev_buffer[i++] = ft_strndup(rest, ft_strlen(rest));
+	if (rest && *rest)
+		prev_buffer[i++] = ft_strndup(rest, ft_strlen(rest) + 1);
 	while (read(fd, buffer, BUFFER_SIZE - 1) > 0)
 	{
 		buffer[BUFFER_SIZE - 1] = '\0';
 		pos = is_newline(buffer);
 		if (pos >= 0)
 		{
-			ft_strcpy(rest, buffer + pos + 1);
+			ft_strcpy(rest, buffer, pos + 1);
 			return (ft_free_join(prev_buffer, buffer, pos + 1, i));
 		}
 		prev_buffer[i++] = ft_strndup(buffer, BUFFER_SIZE - 1);
@@ -75,19 +75,22 @@ char	*get_next_line(int fd)
 	char		*line;
 	int			pos;
 
-	if (!rest)
+	if (rest && *rest)
+	{
+		pos = is_newline(rest);
+		if (pos >= 0)
+		{
+			line = ft_strndup(rest, (size_t) pos + 1);
+			ft_strcpy(rest, rest, pos + 1);
+			return (line);
+		}
+	}
+	else
 	{
 		rest = malloc(sizeof(char) * 54 * BUFFER_SIZE + 1);
 		if (!rest)
 			return (NULL);
 		rest[0] = '\0';
-	}
-	pos = is_newline(rest);
-	if (pos >= 0)
-	{
-		line = ft_strndup(rest, (size_t) pos + 1);
-		ft_strcpy(rest, rest + pos + 1);
-		return (line);
 	}
 	line = first_nl(fd, rest);
 	if (line == NULL)
@@ -108,7 +111,7 @@ void	read_file(char *filename)
 	{
 		while ((line = get_next_line(fd)))
 		{
-			printf("line : %s\n", line);
+			printf("line : %s", line);
 			free(line);
 		}
 	}
@@ -127,7 +130,7 @@ int main(int argc, char **arg)
 	{
 		while ((line = get_next_line(0)))
 		{	
-			printf("line = %s\n", line);
+			printf("line = %s", line);
 			free(line);
 		}
 	}
