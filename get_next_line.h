@@ -10,6 +10,9 @@
 #include <stdlib.h>
 #include <fcntl.h>
 
+char	*first_nl(int fd, char *rest);
+int	is_newline(char *str);
+char	*get_next_line(int fd);
 size_t	ft_strlen(char *str);
 char	*ft_strcpy(char *dst, char *src, int pos);
 void	ft_strncat(char *dst, char *str, int c);

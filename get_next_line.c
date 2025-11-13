@@ -88,9 +88,9 @@ char	*get_next_line(int fd)
 			return (line);
 		}
 	}
-	else
+	else if (!rest)
 	{
-		rest = malloc(sizeof(char) * 54 * BUFFER_SIZE + 1);
+		rest = malloc(sizeof(char) * 24 * BUFFER_SIZE + 1);
 		if (!rest)
 			return (NULL);
 		rest[0] = '\0';
@@ -103,7 +103,7 @@ char	*get_next_line(int fd)
 	}
 	return (line);
 }
-
+/*
 void	read_file(char *filename)
 {
 	int		fd;
@@ -137,4 +137,4 @@ int main(int argc, char **arg)
 			free(line);
 		}
 	}
-}
+}*/
