@@ -1,23 +1,31 @@
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
 
-#ifndef BUFFER_SIZE
-# define BUFFER_SIZE 42
-#endif
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 10000000 
+# endif
 
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <fcntl.h>
+# include <stdio.h>
+# include <unistd.h>
+# include <stdlib.h>
+# include <fcntl.h>
 
-char	*first_nl(int fd, char *rest);
-int	is_newline(char *str);
+typedef struct s_List
+{
+	int				fd;
+	char			*rest;
+	struct s_List	*next;
+}	t_List;
+
+t_List	*get_node(t_List *head, int fd);
+t_List	*ft_lstnew(int fd);
+char	*ft_strjoin(char *s1, char *s2);
 char	*get_next_line(int fd);
 size_t	ft_strlen(char *str);
-char	*ft_strcpy(char *dst, char *src, int pos);
-void	ft_strncat(char *dst, char *str, int c);
-void	free_str(char **str, int c);
+char	*ft_strchr(char *s, int c);
 char	*ft_strndup(char *str, size_t n);
-char	*ft_free_join(char **strs, char *buffer, int n, int c);
+char	*read_buffer(char *content, int fd);
+char	*update_rest(char **rest);
+char	*extract_line(char *line);
 
 #endif

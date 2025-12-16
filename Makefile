@@ -1,5 +1,3 @@
-# Variables 
-
 NAME	= gnline.a
 CC		= cc
 FLAGS	= -Wall -Werror -Wextra

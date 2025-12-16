@@ -4,66 +4,91 @@ size_t	ft_strlen(char *str)
 {
 	int	i;
 
-	if (!str)
-		return (0);
 	i = 0;
 	while (*str++)
 		i++;
 	return (i);
 }
 
-char	*ft_strcpy(char *dst, char *src, int pos)
+char	*ft_strchr(char *s, int c)
 {
-	int		j;
-
-	j = 0;
-    while (src[pos])
-            dst[j++] = src[pos++];
-	dst[j] = '\0';
-    return (dst);
-
-}
-
-void	ft_strncat(char *dst, char *src, int c)
-{
-	int	i;
-	int	j;
-
-	i = 0;
-	j = 0;
-	while (dst[i])
-		i++;
-	while (j < c)
-		dst[i++] = src[j++];
-	dst[i] = '\0';
-}
-
-char	*ft_strndup(char *str, size_t n)
-{
-	char	*dup;
+	size_t	len;
 	size_t	i;
 
-	i = 0;
-	dup = (char *)malloc(sizeof(char) * n + 1);
-	if (!dup)
+	if (!s)
 		return (NULL);
-	while (i < n)
+	c = (char) c;
+	len = ft_strlen(s);
+	i = 0;
+	while (i < len + 1)
 	{
-		dup[i] = str[i];
+		if (s[i] == c)
+			return ((char *)s + i);
 		i++;
 	}
-	dup[i] = '\0';
-	return (dup);
+	return (NULL);
 }
 
-void	free_str(char **str, int c)
+char	*ft_strndup(char *s, size_t n)
 {
-	int	i;
+	char	*cpy;
+	size_t	i;
 
+	if (!s)
+		return (NULL);
+	cpy = malloc(sizeof(*cpy) * n + 1);
+	if (!cpy || !s)
+		return (NULL);
 	i = 0;
-	if (!str)
-		return ;
-	while (i < c)
-		free(str[i++]);
-	free(str);
+	while (i < n)
+	{
+		cpy[i] = s[i];
+		i++;
+	}
+	cpy[i] = '\0';
+	return (cpy);
+}
+
+t_List	*ft_lstnew(int fd)
+{
+	t_List	*elem;
+
+	elem = malloc(sizeof(t_List));
+	if (!elem)
+		return (NULL);
+	elem->rest = ft_strndup("", 0);
+	if (!elem->rest)
+		return (free(elem), elem = NULL, NULL);
+	elem->fd = fd;
+	elem->next = NULL;
+	return (elem);
+}
+
+char	*ft_strjoin(char *s1, char *s2)
+{
+	char	*conq;
+	size_t	len;
+	int		i;
+	int		k;
+	int		j;
+
+	k = 0;
+	i = 0;
+	j = 0;
+	if (!s1 || !s2)
+		return (NULL);
+	len = ft_strlen(s1) + ft_strlen(s2);
+	conq = malloc(sizeof(char) * len + 1);
+	if (!conq)
+	{
+		free(s1);
+		s1 = NULL;
+		return (NULL);
+	}
+	while (s1[k])
+		conq[i++] = s1[k++];
+	while (s2[j])
+		conq[i++] = s2[j++];
+	conq[i] = '\0';
+	return (free(s1), s1 = NULL, conq);
 }

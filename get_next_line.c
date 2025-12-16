@@ -1,121 +1,120 @@
 #include "get_next_line.h"
 
-int	is_newline(char *str)
+t_List	*get_node(t_List *node, int fd)
 {
-	int	i;
-
-	i = 0;
-	if (!str)
-		return (-1);
-	while (str[i])
+	if (!node)
+		return (NULL);
+	while (node->next)
 	{
-		if (str[i] == '\n' || str[i] == '\0')
-			return (i);
-		i++;
+		if (node->fd == fd)
+			return (node);
+		node = node->next;
 	}
-	return (-1);
+	if (node->fd == fd)
+		return (node);
+	node->next = ft_lstnew(fd);
+	return (node->next);
 }
 
-char	*ft_free_join(char **strs, char *buffer, int n, int c)
+char	*read_buffer(char *content, int fd)
 {
-	size_t	len;
+	int		nbytes_read;
+	char	*buffer;
+
+	if (content && ft_strchr(content, '\n'))
+		return (content);
+	buffer = malloc(sizeof(*buffer) * BUFFER_SIZE + 1);
+	if (!buffer)
+		return (NULL);
+	nbytes_read = 5;
+	while (nbytes_read > 0)
+	{
+		nbytes_read = read(fd, buffer, BUFFER_SIZE);
+		if (nbytes_read == -1)
+			return (free(buffer), free(content), NULL);
+		buffer[nbytes_read] = '\0';
+		if (nbytes_read != 0)
+			content = ft_strjoin(content, buffer);
+		if (!content || !content[0] || ft_strchr(content, '\n'))
+			break ;
+	}
+	return (free(buffer), content);
+}
+
+char	*extract_line(char *dirty_line)
+{
+	char	*clean_line;
 	int		i;
-	char	*join;
 
 	i = 0;
-	len = 0;
-	if (!strs)
+	if (!dirty_line[0] || !dirty_line)
 		return (NULL);
-	strs[c] = NULL;
-	while (i < c)
-		len += ft_strlen(strs[i++]);
-	join = malloc(sizeof(char) * (len + 1) + BUFFER_SIZE + 1);
-	if (!join)
-		return (NULL);
-	join[0] = '\0';
-	i = -1;
-	while (++i < c)
-		ft_strncat(join, strs[i], ft_strlen(strs[i]));
-	ft_strncat(join, buffer, n);
-	free_str(strs, c);
-	return (join);
+	while (dirty_line[i] != '\n' && dirty_line[i])
+		i++;
+	if (dirty_line[i] == '\n')
+		i++;
+	clean_line = ft_strndup(dirty_line, i);
+	return (clean_line);
 }
 
-char	*first_nl(int fd, char *rest)
+char	*update_rest(char **rest)
 {
-	char		**prev_buffer;
-	char		buffer[BUFFER_SIZE];
-	int			i;
-	int			pos;
-	ssize_t		nbytes;
+	size_t	i;
+	char	*new_rest;
 
-	prev_buffer = malloc(sizeof(char *) * 4 * BUFFER_SIZE + 1);
-	if (!prev_buffer)
+	if (!rest || !*rest || !(*rest)[0])
 		return (NULL);
 	i = 0;
-	if (rest && *rest)
-		prev_buffer[i++] = ft_strndup(rest, ft_strlen(rest) + 1);
-	nbytes = read(fd, buffer, BUFFER_SIZE - 1);
-	while (nbytes)
-	{
-		buffer[nbytes] = '\0';
-		pos = is_newline(buffer);
-		if (pos >= 0)
-		{
-			ft_strcpy(rest, buffer, pos + 1);
-			return (ft_free_join(prev_buffer, buffer, pos + 1, i));
-		}
-		prev_buffer[i++] = ft_strndup(buffer, BUFFER_SIZE - 1);
-		nbytes = read(fd, buffer, BUFFER_SIZE - 1);
-	}
-	free(prev_buffer);
-	return (NULL);
+	while ((*rest)[i] != '\n' && (*rest)[i])
+		i++;
+	if ((*rest)[i] == '\n')
+		i++;
+	new_rest = ft_strndup(&(*rest)[i], ft_strlen(*rest) - i);
+	free(*rest);
+	*rest = NULL;
+	return (new_rest);
 }
 
 char	*get_next_line(int fd)
 {
-	static char	*rest;
-	char		*line;
-	int			pos;
+	static t_List	*head;
+	t_List			*node;
+	char			*line;
 
-	if (rest && *rest)
-	{
-		pos = is_newline(rest);
-		if (pos >= 0)
-		{
-			line = ft_strndup(rest, (size_t) pos + 1);
-			ft_strcpy(rest, rest, pos + 1);
-			return (line);
-		}
-	}
-	else if (!rest)
-	{
-		rest = malloc(sizeof(char) * 24 * BUFFER_SIZE + 1);
-		if (!rest)
-			return (NULL);
-		rest[0] = '\0';
-	}
-	line = first_nl(fd, rest);
-	if (line == NULL)
-	{
-		free(rest);
+	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	}
+	if (!head)
+		head = ft_lstnew(fd);
+	node = get_node(head, fd);
+	if (!node)
+		return (NULL);
+	node->rest = read_buffer(node->rest, fd);
+	if (!node->rest || !node->rest[0])
+		return (free(node->rest), node->rest = NULL, free(head), head = NULL, NULL);
+	line = extract_line(node->rest);
+	if (!line)
+		return (NULL);
+	node->rest = update_rest(&node->rest);
+	if (!node->rest)
+		return (node->rest = NULL, NULL);
 	return (line);
 }
 /*
 void	read_file(char *filename)
 {
-	int		fd;
 	char	*line;
+	int		fd = open(filename, O_RDONLY);
+	int		i = 0;
 
-	fd = open(filename, O_RDONLY);
 	if (fd != -1)
 	{
-		while ((line = get_next_line(fd)))
-		{
-			printf("line : %s", line);
-			free(line);
+		while (i < 14)
+		{	
+			line = get_next_line(fd);
+			printf("line = %s", line);
+			if (line)
+				free(line);
+			i++;
 		}
 	}
 	else
@@ -137,4 +136,5 @@ int main(int argc, char **arg)
 			free(line);
 		}
 	}
-}*/
+}
+*/
