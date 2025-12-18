@@ -1,6 +1,6 @@
 #include "get_next_line.h"
 
-t_List	*get_node(t_List *List, int fd)
+static t_List	*get_node(t_List *List, int fd)
 {
 	if (List == NULL)
 		return (NULL);
@@ -16,7 +16,7 @@ t_List	*get_node(t_List *List, int fd)
 	return (List->next);
 }
 
-int	free_node(t_List **head, t_List *node)
+static int	free_node(t_List **head, t_List *node)
 {
 	t_List	*temp;
 
@@ -38,7 +38,7 @@ int	free_node(t_List **head, t_List *node)
 	return (0);
 }
 
-char	*read_buffer(char *content, int fd)
+static char	*read_buffer(char *content, int fd)
 {
 	int		nbytes_read;
 	char	*buffer;
@@ -63,7 +63,7 @@ char	*read_buffer(char *content, int fd)
 	return (free(buffer), buffer = NULL, content);
 }
 
-char	*extract_line(char **dirty_line)
+static char	*extract_line(char **dirty_line)
 {
 	char	*clean_line;
 	char	*temp;

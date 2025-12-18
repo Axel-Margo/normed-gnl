@@ -1,6 +1,6 @@
 #include "get_next_line_bonus.h"
 
-size_t	ft_strlen(char *str)
+static size_t	ft_strlen(char *str)
 {
 	int	i;
 
@@ -10,7 +10,7 @@ size_t	ft_strlen(char *str)
 	return (i);
 }
 
-char	*ft_strchr(char *s, int c)
+static char	*ft_strchr(char *s, int c)
 {
 	size_t	len;
 	size_t	i;
@@ -29,7 +29,7 @@ char	*ft_strchr(char *s, int c)
 	return (NULL);
 }
 
-char	*ft_strndup(char *s, size_t n)
+static char	*ft_strndup(char *s, size_t n)
 {
 	char	*cpy;
 	size_t	i;
@@ -49,7 +49,7 @@ char	*ft_strndup(char *s, size_t n)
 	return (cpy);
 }
 
-t_List	*ft_lstnew(int fd)
+static t_List	*ft_lstnew(int fd)
 {
 	t_List	*elem;
 
@@ -64,7 +64,7 @@ t_List	*ft_lstnew(int fd)
 	return (elem);
 }
 
-char	*ft_strjoin(char *s1, char *s2)
+static char	*ft_strjoin(char *s1, char *s2)
 {
 	char	*conq;
 	size_t	len;
